@@ -1,7 +1,7 @@
 rm(list = ls())
 # change the path to your Load_zips path
 library(readr)
-setwd("/Users/Rene/Desktop/NovaAnalyticsGroup/NAG_PROJECT_02/R_Exploration/Load_zips/")
+setwd("Users/andrew_talas/Documents/1_NOVA/Analytics_Group/EDP_Project/Load_zips")
 list.files("Load_zips")
 LargeHotel = read_csv("RefBldgLargeHotel.zip")
 ServiceRestaurant = read_csv("RefBldgFullServiceRestaurant.zip")
@@ -12,10 +12,10 @@ School = read_csv("RefBldgSecondarySchool.zip")
 Supermarket = read_csv("RefBldgSupermarket.zip")
 Warehouse = read_csv("RefBldgWarehouse.zip")
 
-#library
 library(ggplot2)
 library(reshape)
 library(tidyr)
+
 #Splitting the Time Frame for all categories and factoring
 Hospital <- separate(data = Hospital, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
 Hospital$Time <- as.factor(Hospital$Time)
@@ -40,4 +40,17 @@ ggplot(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, g
 ggplot(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + geom_smooth(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`))
 ggplot(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) +geom_jitter(alpha=0.1)
 
-#Plotting all categories
+
+# start plotting with titles 
+ggplot(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Hospital")
+ggplot(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + geom_smooth(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`)) + ggtitle("Hospital")
+ggplot(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) +geom_jitter(alpha=0.1) + ggtitle("Hospital")
+
+ggplot(data = LargeOffice, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Large Office")
+ggplot(data = ServiceRestaurant, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Service Restaurant")
+ggplot(data = LargeHotel, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Large Hotel")
+ggplot(data = Patient, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Patient")
+ggplot(data = School, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("School")
+ggplot(data = Supermarket, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Supermarket")
+ggplot(data = Warehouse, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Warehouse")
+
