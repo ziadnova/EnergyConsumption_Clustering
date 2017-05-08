@@ -16,10 +16,28 @@ Warehouse = read_csv("RefBldgWarehouse.zip")
 library(ggplot2)
 library(reshape)
 library(tidyr)
+#Splitting the Time Frame for all categories and factoring
 Hospital <- separate(data = Hospital, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
 Hospital$Time <- as.factor(Hospital$Time)
+LargeHotel <- separate(data = LargeHotel, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
+LargeHotel$Time <- as.factor(LargeHotel$Time)
+ServiceRestaurant <- separate(data = ServiceRestaurant, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
+ServiceRestaurant$Time <- as.factor(ServiceRestaurant$Time)
+LargeOffice <- separate(data = LargeOffice, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
+LargeOffice$Time <- as.factor(LargeOffice$Time)
+Patient <- separate(data = Patient, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
+Patient$Time <- as.factor(Patient$Time)
+School <- separate(data = School, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
+School$Time <- as.factor(School$Time)
+Supermarket <- separate(data = Supermarket, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
+Supermarket$Time <- as.factor(Supermarket$Time)
+Warehouse <- separate(data = Warehouse, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
+Warehouse$Time <- as.factor(Warehouse$Time)
+
 
 # start plotting
 ggplot(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1)
 ggplot(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + geom_smooth(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`))
 ggplot(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) +geom_jitter(alpha=0.1)
+
+#Plotting all categories
