@@ -12,6 +12,7 @@ School = read_csv("RefBldgSecondarySchool.zip")
 Supermarket = read_csv("RefBldgSupermarket.zip")
 Warehouse = read_csv("RefBldgWarehouse.zip")
 
+#library
 library(ggplot2)
 library(reshape)
 library(tidyr)
