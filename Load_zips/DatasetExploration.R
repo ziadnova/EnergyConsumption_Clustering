@@ -19,25 +19,18 @@ library(tidyr)
 #DFs
 Hospital <- separate(data = Hospital, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
 Hospital$Time <- as.factor(Hospital$Time)
-
 LargeOffice = separate(data = LargeOffice, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
 LargeOffice$Time = as.factor(LargeOffice$Time)
-
 ServiceRestaurant = separate(data = ServiceRestaurant, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
 ServiceRestaurant$Time = as.factor(ServiceRestaurant$Time)
-
 LargeHotel = separate(data = LargeHotel, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
 LargeHotel$Time = as.factor(LargeHotel$Time)
-
 Patient = separate(data = Patient, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
 Patient$Time = as.factor(Patient$Time)
-
 School = separate(data = School, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
 School$Time = as.factor(School$Time)
-
 Supermarket = separate(data = Supermarket, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
 Supermarket$Time = as.factor(Supermarket$Time)
-
 Warehouse = separate(data = Warehouse, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
 Warehouse$Time = as.factor(Warehouse$Time)
 
