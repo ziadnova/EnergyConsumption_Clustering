@@ -1,7 +1,11 @@
 rm(list = ls())
 # change the path to your Load_zips path
 library(readr)
-setwd("Users/andrew_talas/Documents/1_NOVA/Analytics_Group/EDP_Project/Load_zips")
+library(ggplot2)
+library(reshape)
+library(tidyr)
+
+setwd("C:\\Users\\jonat\\OneDrive\\Documents\\GitHub\\EnergyConsumption_Clustering\\Load_zips")
 list.files("Load_zips")
 LargeHotel = read_csv("RefBldgLargeHotel.zip")
 ServiceRestaurant = read_csv("RefBldgFullServiceRestaurant.zip")
@@ -11,10 +15,32 @@ Patient = read_csv("RefBldgOutPatient.zip")   #Clarify meaning
 School = read_csv("RefBldgSecondarySchool.zip")
 Supermarket = read_csv("RefBldgSupermarket.zip")
 Warehouse = read_csv("RefBldgWarehouse.zip")
+data.list <- list(LargeHotel, ServiceRestaurant, Hospital, LargeOffice, Patient, School, Supermarket, Warehouse)
+cnames <- joint_colnames (data.list)
+cnames
 
-library(ggplot2)
-library(reshape)
-library(tidyr)
+joint_colnames <- function (df_list) {
+  df_list <- data.list
+  cnames <- colnames(df_list[[1]])
+  for (index in 2: length(df_list)) {
+    cnames <- cnames[sapply (cnames, function(x) {
+    x <- any(x == colnames(df_list[[index]]))
+    })]
+  }
+  cnames
+  return (cnames)
+}
+
+join_data <- function (df_list) {
+  joint_dataset <- df_list[[1]][cnames]
+  
+  for (i in 2:length(df_list)) {
+    joint_dataset <- rbind(joint_dataset, df_list[[i]][cnames])
+  }
+  return (joint_dataset)
+}
+data <- join_data (data.list)
+data
 
 #Splitting the Time Frame for all categories and factoring
 Hospital <- separate(data = Hospital, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
