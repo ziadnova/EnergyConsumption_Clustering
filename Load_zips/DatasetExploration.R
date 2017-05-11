@@ -5,61 +5,60 @@ library(ggplot2)
 library(reshape)
 library(tidyr)
 
-setwd("C:\\Users\\jonat\\OneDrive\\Documents\\GitHub\\EnergyConsumption_Clustering\\Load_zips")
-list.files("Load_zips")
-LargeHotel = read_csv("RefBldgLargeHotel.zip")
-ServiceRestaurant = read_csv("RefBldgFullServiceRestaurant.zip")
-Hospital = read_csv("RefBldgHospital.zip")
-LargeOffice = read_csv("RefBldgLargeOffice.zip")
-Patient = read_csv("RefBldgOutPatient.zip")   #Clarify meaning
-School = read_csv("RefBldgSecondarySchool.zip")
-Supermarket = read_csv("RefBldgSupermarket.zip")
-Warehouse = read_csv("RefBldgWarehouse.zip")
-data.list <- list(LargeHotel, ServiceRestaurant, Hospital, LargeOffice, Patient, School, Supermarket, Warehouse)
-cnames <- joint_colnames (data.list)
-cnames
+####################################################################
+######################### FUNCTIONS ################################
+####################################################################
 
+# join_column_names
 joint_colnames <- function (df_list) {
-  df_list <- data.list
-  cnames <- colnames(df_list[[1]])
-  for (index in 2: length(df_list)) {
+  cnames <- colnames(df_list[[2]])
+  for (index in 3: length(df_list)) {
     cnames <- cnames[sapply (cnames, function(x) {
-    x <- any(x == colnames(df_list[[index]]))
+      x <- any(x == colnames(df_list[[index]]))
     })]
   }
-  cnames
   return (cnames)
 }
 
+#join datasets
 join_data <- function (df_list) {
-  joint_dataset <- df_list[[1]][cnames]
+  cnames <- joint_colnames(df_list)
+  joint_dataset <- df_list[[2]][cnames]
   
-  for (i in 2:length(df_list)) {
+  for (i in 3:length(df_list)) {
     joint_dataset <- rbind(joint_dataset, df_list[[i]][cnames])
   }
   return (joint_dataset)
 }
-data <- join_data (data.list)
+
+# split date and time and date/time variable into two variables
+split_date_time <- function (df) {
+  df <- separate(data = df, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
+  df$Time <- as.factor(df$Time)
+  return (df)
+}
+
+# 
+split_all <- function (df_list) {
+  return(sapply(df_list, function(x) split_date_time(x)))
+}
+
+setwd("C:\\Users\\jonat\\OneDrive\\Documents\\GitHub\\EnergyConsumption_Clustering\\Load_zips")
+# list.files("Load_zips")
+data <- list()
+data$all <- data.frame()
+data$LargeHotel = read_csv("RefBldgLargeHotel.zip")
+data$ServiceRestaurant = read_csv("RefBldgFullServiceRestaurant.zip")
+data$Hospital = read_csv("RefBldgHospital.zip")
+data$LargeOffice = read_csv("RefBldgLargeOffice.zip")
+data$Patient = read_csv("RefBldgOutPatient.zip")   #Clarify meaning
+data$School = read_csv("RefBldgSecondarySchool.zip")
+data$Supermarket = read_csv("RefBldgSupermarket.zip")
+data$Warehouse = read_csv("RefBldgWarehouse.zip")
+
+data$all <- join_data(data)
+data <- split_all (data)
 data
-
-#Splitting the Time Frame for all categories and factoring
-Hospital <- separate(data = Hospital, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
-Hospital$Time <- as.factor(Hospital$Time)
-LargeHotel <- separate(data = LargeHotel, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
-LargeHotel$Time <- as.factor(LargeHotel$Time)
-ServiceRestaurant <- separate(data = ServiceRestaurant, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
-ServiceRestaurant$Time <- as.factor(ServiceRestaurant$Time)
-LargeOffice <- separate(data = LargeOffice, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
-LargeOffice$Time <- as.factor(LargeOffice$Time)
-Patient <- separate(data = Patient, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
-Patient$Time <- as.factor(Patient$Time)
-School <- separate(data = School, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
-School$Time <- as.factor(School$Time)
-Supermarket <- separate(data = Supermarket, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
-Supermarket$Time <- as.factor(Supermarket$Time)
-Warehouse <- separate(data = Warehouse, col = `Date/Time`, into = c("Date", "Time"), sep = "  ")
-Warehouse$Time <- as.factor(Warehouse$Time)
-
 
 # start plotting
 ggplot(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1)
