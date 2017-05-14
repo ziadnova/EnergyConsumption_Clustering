@@ -4,6 +4,10 @@ library(readr)
 library(ggplot2)
 library(reshape)
 library(tidyr)
+library(fpc)
+
+setwd("C:\\Users\\jonat\\OneDrive\\Documents\\GitHub\\EnergyConsumption_Clustering\\Load_zips")
+
 
 ####################################################################
 ######################### FUNCTIONS ################################
@@ -43,7 +47,6 @@ split_all <- function (df_list) {
   return(sapply(df_list, function(x) split_date_time(x)))
 }
 
-setwd("C:\\Users\\jonat\\OneDrive\\Documents\\GitHub\\EnergyConsumption_Clustering\\Load_zips")
 # list.files("Load_zips")
 data <- list()
 data$all <- data.frame()
@@ -58,7 +61,6 @@ data$Warehouse = read_csv("RefBldgWarehouse.zip")
 
 data$all <- join_data(data)
 data <- split_all (data)
-data
 
 # start plotting
 ggplot(data = Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1)
@@ -79,3 +81,27 @@ ggplot(data = School, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, gro
 ggplot(data = Supermarket, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Supermarket")
 ggplot(data = Warehouse, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Warehouse")
 
+############################################################################
+#                               CLUSTERING                                 #
+############################################################################
+
+# not more than 65536 observations are allowed for this package (should use less - 65000 rows returned error that vector needs 15,7 Gb space)
+# if deployed in live version, number of clusters should be determined with representative subset of the whole data
+## as done here: not a random sample
+  data_exc <- data$all[1:5000,3:10]
+  pamk.best <- pamk(data_exc)
+  cat("number of clusters estimated by optimum average silhouette width:", pamk.best$nc, "\n")
+  # don't know why this is not working
+  plot(pam(data_exc, pamk.best$nc))
+
+# random clustering with three centers on numerical data from data frame
+# (date and time would have to be converted to numbers to be included in clustering)
+  kmeans(data$all[, 3:10], centers = 3, iter.max = 100)
+
+# draw elbow graph to determine number of clusters
+  mydata <- data$all[, 3:10]
+  wss <- (nrow(mydata)-1)*sum(apply(mydata,2,var))
+  for (i in 2:15) wss[i] <- sum(kmeans(mydata,
+                                       centers=i, iter.max = 1000)$withinss)
+  plot(1:15, wss, type="b", xlab="Number of Clusters",
+       ylab="Within groups sum of squares")
