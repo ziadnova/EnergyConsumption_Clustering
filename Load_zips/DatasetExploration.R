@@ -47,6 +47,47 @@ split_all <- function (df_list) {
   return(sapply(df_list, function(x) split_date_time(x)))
 }
 
+detectWeekdays <- function(data) {
+  ###
+  # label days according to week days
+  # assumption: weekend consumption significantly lower than weekdays --> low low high high high high high low low : low -> weekend
+  dates <- as.data.frame(unique(data$all[,"Date"]))
+  day_avg <- list()
+  for (k in 1:length(names(data))) {
+    data_p <- data[[k]]
+    temp_matrix <- matrix(c(0),ncol=(ncol(data_p)-2), nrow=dim(dates)[1])
+    rownames(temp_matrix) <- dates[,1]
+    for (i in 1:dim(dates)[1]) {
+      date <- as.data.frame(dates)[i,]
+      # TODO: replace 1:8 and 3:10 with dynamic numbers - could be source of error if data changes
+      temp_matrix[date,1:ncol(temp_matrix)] <- sapply(data_p[data_p[,"Date"]==date,3:ncol(data_p)], mean)
+    }
+    temp_matrix <- scale(temp_matrix)
+    day_avg[[names(data)[k]]] <- temp_matrix
+    j <- j+1
+  }
+  weekday_pattern <- apply((day_avg$all), MARGIN = 1, sum)
+  days <- list()
+  loadings <- c()
+  for (i in 1:7) {
+    days[[paste("day", i, sep="")]]$indices <- seq(from=i, to=365, by=7)
+    days[[paste("day", i, sep="")]]$norm_sum_consump <- sum(weekday_pattern[seq(from=i, to=365, by=7)])
+    loadings <- c(loadings, sum(weekday_pattern[seq(from=i, to=365, by=7)]))
+  }
+  weekdays <- c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+  for (i in which(loadings == min(loadings)):(which(loadings == min(loadings)) + 6)) {
+    days[[i]]$weekday <- weekdays[i]
+  }
+  
+  for (day in 1:dim(dates)[1]) {
+    dates[day, "Weekday"] <- days[[(day%%7)+1]]$weekday
+  }
+  for (row in 1:dim(data$all)[1]) {
+    data$all[row,"Weekday"] <- dates[dates[,"Date"]==as.data.frame(data$all)[row,"Date"],"Weekday"]
+  }
+  return (data)
+}
+
 # list.files("Load_zips")
 data <- list()
 data$all <- data.frame()
@@ -61,26 +102,9 @@ data$Warehouse = read_csv("RefBldgWarehouse.zip")
 
 data$all <- join_data(data)
 data <- split_all (data)
+data <- detectWeekdays(data)
 
-
-###
-# label days according to week days
-# assumption: weekend consumption significantly lower than weekdays --> low low high high high high high low low : low -> weekend
-dates <- as.data.frame(unique(data$all[,"Date"]))
-day_avg <- list()
-j <- 1
-for (data_p in data) { 
-  print(j)
-  temp_matrix <- matrix(c(0),ncol=(ncol(data_p)-2), nrow=dim(dates)[1])
-  rownames(temp_matrix) <- dates[,1]
-  for (i in 1:dim(dates)[1]) {
-    date <- as.data.frame(dates)[i,]
-    temp_matrix[date,1:8] <- sapply(data_p[data_p[,"Date"]==date,3:10], mean)
-  }
-  day_avg[[date]] <- temp_matrix
-  j <- j+1
-}
-day_avg
+# TODO: make graph method generic
 # start plotting
 ggplot(data = data$Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1)
 ggplot(data = data$Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + geom_smooth(data = data$Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`))
@@ -93,12 +117,12 @@ ggplot(data = data$Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly
 ggplot(data = data$Hospital, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) +geom_jitter(alpha=0.1) + ggtitle("Hospital")
 
 ggplot(data = data$LargeOffice, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Large Office")
-ggplot(data = ServiceRestaurant, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Service Restaurant")
-ggplot(data = LargeHotel, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Large Hotel")
-ggplot(data = Patient, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Patient")
-ggplot(data = School, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("School")
-ggplot(data = Supermarket, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Supermarket")
-ggplot(data = Warehouse, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Warehouse")
+ggplot(data = data$ServiceRestaurant, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Service Restaurant")
+ggplot(data = data$LargeHotel, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Large Hotel")
+ggplot(data = data$Patient, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Patient")
+ggplot(data = data$School, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("School")
+ggplot(data = data$Supermarket, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Supermarket")
+ggplot(data = data$Warehouse, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date)) + geom_line(alpha= 0.1) + ggtitle("Warehouse")
 ############################################################################
 #                               CLUSTERING                                 #
 ############################################################################
