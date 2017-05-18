@@ -1,0 +1,59 @@
+
+#install.packages("dateTime")
+
+#Creating a new column IsWd to detect whether a day is a weekday or not
+#for all the data sets
+for(j in 1:length(data)){
+  oi=c()
+  for(i in 1:nrow(data[[j]])){
+    fulldate = paste(data[[j]][i,"Date"],"/2004",sep='')
+    newdate= strptime(fulldate, "%m/%d/%Y")
+    oi[i] = isWeekday(as.Date(newdate))
+  }
+  data[[j]]$IsWD = oi
+}
+
+library(ggplot2)
+
+
+
+#Subset weekdays from weekends for each datasets
+#and plot them in the same graph
+# Red : Weekends  Green : Weekdays
+LargeHotelWeekDays = subset(data[[2]], IsWD==TRUE)
+LargeHotelWeekEnds = subset(data[[2]], IsWD==FALSE)
+(
+ggplot() + 
+  geom_line(data=LargeHotelWeekDays, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date), color='green') + 
+  geom_line(data=LargeHotelWeekEnds, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date), color='red')
+)
+
+
+SchoolWeekDays = subset(data[[7]], IsWD==TRUE)
+SchoolWeekEnds = subset(data[[7]], IsWD==FALSE)
+
+(
+  ggplot() + 
+    geom_line(data=SchoolWeekDays, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date), color='green') + 
+    geom_line(data=SchoolWeekEnds, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date), color='red')
+)
+
+SuperMarketWeekDays = subset(data[[8]], IsWD==TRUE)
+SuperMarketWeekEnds = subset(data[[8]], IsWD==FALSE)
+
+(
+  ggplot() + 
+    geom_line(data=SuperMarketWeekDays, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date), color='green') + 
+    geom_line(data=SuperMarketWeekEnds, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date), color='red')
+)
+
+
+LargeOfficeWeekDays = subset(data[[5]], IsWD==TRUE)
+LargeOfficeWeekEnds = subset(data[[5]], IsWD==FALSE)
+
+(
+  ggplot() + 
+    geom_line(data=LargeOfficeWeekDays, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date), color='green') + 
+    geom_line(data=LargeOfficeWeekEnds, aes(x = Time, y = `Electricity:Facility [kW](Hourly)`, group = Date), color='red')
+)
+
