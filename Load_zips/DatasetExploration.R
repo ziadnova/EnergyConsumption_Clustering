@@ -1,13 +1,29 @@
 rm(list = ls())
 # change the path to your Load_zips path
 library(readr)
-setwd("Users/andrew_talas/Documents/1_NOVA/Analytics_Group/EDP_Project/Load_zips")
+setwd("/Users/Rene/EnergyConsumption_Github/EnergyConsumption_Clustering/Load_zips/")
 list.files("Load_zips")
+
+
+
+setwd("/Users/Rene/EnergyConsumption_Github/EnergyConsumption_Clustering/Load_zips/")
+
+#####
+
+Folders<- list.dirs(full.names = TRUE)
+#go through every folder 
+
+file_names <- dir("") #where you have your files
+#setwd("/Users/Rene/EnergyConsumption_Github/EnergyConsumption_Clustering/Load_zips/")
+your_data_frame <- do.call(rbind,lapply(file_names,read.csv))
+
+#####
+
 LargeHotel = read_csv("RefBldgLargeHotel.zip")
 ServiceRestaurant = read_csv("RefBldgFullServiceRestaurant.zip")
 Hospital = read_csv("RefBldgHospital.zip")
 LargeOffice = read_csv("RefBldgLargeOffice.zip")
-Patient = read_csv("RefBldgOutPatient.zip")   #Clarify meaning
+Patient = read_csv("RefBldgOutPatient.zip")   
 School = read_csv("RefBldgSecondarySchool.zip")
 Supermarket = read_csv("RefBldgSupermarket.zip")
 Warehouse = read_csv("RefBldgWarehouse.zip")
