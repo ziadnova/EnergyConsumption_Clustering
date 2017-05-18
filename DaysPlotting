@@ -1,5 +1,5 @@
 
-#install.packages("dateTime")
+#install.packages("timeDate")
 
 #Creating a new column IsWd to detect whether a day is a weekday or not
 #for all the data sets
